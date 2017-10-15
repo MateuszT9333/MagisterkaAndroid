@@ -5,6 +5,9 @@ package com.example.android.utils;
 
 import com.example.android.common.logger.Log;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,8 +40,7 @@ public class NMEA {
     class GPRMC implements SentenceParser {
         public boolean parse(String[] tokens, GPSPosition position) {
             if (!tokens[1].equals("")) {
-                tokens[1] = tokens[1].substring(0,tokens[1].indexOf("."));
-                position.time = Integer.parseInt(tokens[1]);
+                position.time = Float.parseFloat(tokens[1]);
             }
             if (!((tokens[3].equals("")) || (tokens[4].equals("")))) {
                 position.lat = Latitude2Decimal(tokens[3], tokens[4]);
@@ -53,14 +55,37 @@ public class NMEA {
                 position.dir = Float.parseFloat(tokens[8]);
             }
             if (!tokens[9].equals("")) {
-                position.day = Integer.parseInt(tokens[9]);
+                position.day = Float.parseFloat(tokens[9]);
+            }
+
+            int time = Math.round(position.time);
+            String godzina = Integer.toString(time/10000);
+            int minutySekundy = time%10000;
+            String minuta = Integer.toString(minutySekundy/100);
+            String sekunda = Integer.toString(minutySekundy%100);
+            int date = Math.round(position.day);
+            String dzien = Integer.toString(date/10000);
+            int miesiaceLata = date%10000;
+            String miesiac = Integer.toString(miesiaceLata/100);
+            String rok = Integer.toString(miesiaceLata%100);
+            String dataDelimiter = "-";
+            String timeDelimiter = ":";
+            String dataString = rok + dataDelimiter + miesiac + dataDelimiter + dzien + " " +
+                    godzina + timeDelimiter + minuta + timeDelimiter + sekunda;
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yy-mm-dd hh:mm:ss");
+            try{
+                position.dateFromGps = formatter.parse(dataString);
+            }catch (ParseException e){
+                position.dateFromGps = null;
+                e.printStackTrace();
             }
             return true;
         }
     }
 
     public class GPSPosition {
-        public int time = 0;
+        public float time = 0.0f;
         public float lat = 0.0f;
         public float lon = 0.0f;
         public boolean fixed = false;
@@ -68,14 +93,14 @@ public class NMEA {
         public float dir = 0.0f;
         public float altitude = 0.0f;
         public float velocity = 0.0f;
-        public int day = 0;
-
+        public float day = 0.0f;
         public void updatefix() {
             fixed = quality > 0;
         }
+        public Date dateFromGps = new Date();
 
         public String toString() {
-            return String.format("POSITION: lat: %f, lon: %f, time: %d,day %d, Q: %d, dir: %f, alt: %f, vel: %f", lat, lon, time, day, quality, dir, altitude, velocity);
+            return String.format("POSITION: lat: %f, lon: %f, time: %f,day %f,dir: %f, vel: %f", lat, lon, time, day, dir, velocity);
         }
     }
 

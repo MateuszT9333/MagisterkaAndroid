@@ -27,6 +27,7 @@ import android.os.Message;
 import android.os.SystemClock;
 
 import com.example.android.common.logger.Log;
+import com.example.android.utils.DBHelper;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -57,6 +58,7 @@ public class BluetoothChatService {
     // Member fields
     private final BluetoothAdapter mAdapter;
     private final Handler mHandler;
+    private final Context mContext;
     private AcceptThread mSecureAcceptThread;
     private AcceptThread mInsecureAcceptThread;
     private ConnectThread mConnectThread;
@@ -81,6 +83,7 @@ public class BluetoothChatService {
         mState = STATE_NONE;
         mNewState = mState;
         mHandler = handler;
+        mContext=context;
     }
 
     /**
@@ -464,7 +467,8 @@ public class BluetoothChatService {
         private final BluetoothSocket mmSocket;
         public final InputStream mmInStream;
         public final OutputStream mmOutStream;
-        SaveToDatabase saveToDatabase = null;
+        BluetoothDataParser bluetoothDataParser = null;
+        DBHelper dbHelper = null;
 
         public ConnectedThread(BluetoothSocket socket, String socketType) {
             Log.d(TAG, "create ConnectedThread: " + socketType);
@@ -486,9 +490,14 @@ public class BluetoothChatService {
         }
 
         public void run() {
-            if(saveToDatabase == null){
-                saveToDatabase = SaveToDatabase.getInstance();
+            int dataNMEA = 0; //0 brak pozycji gps, 1 pozycja gps
+            if(bluetoothDataParser == null){ //utworzenie jednego obiektu dataparser
+                bluetoothDataParser = BluetoothDataParser.getInstance();
             }
+            if(dbHelper == null){ // utworz obiekt komunikujacy sie z baza
+                dbHelper = new DBHelper(mContext);
+            }
+
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int size;
@@ -498,9 +507,14 @@ public class BluetoothChatService {
                     if(mmInStream.available()>0) {
                         // Read from the InputStream
                         DataInputStream dataInputStream = new DataInputStream(mmInStream);
-                        dataInputStream.readFully(buffer,0,180);
+                        if(dataNMEA == 0) {
+                            dataInputStream.readFully(buffer, 0, 200);
+                        }else{
+                            dataInputStream.readFully(buffer, 0, 300);
+                        }
                         //Log.i("Message", new String(buffer));
-                        saveToDatabase.addString(new String(buffer));
+                        dataNMEA = bluetoothDataParser.addString(new String(buffer), dbHelper);
+                        Log.i("Liczba wierszy", String.valueOf(dbHelper.numberOfRows()));
                     }
                     else SystemClock.sleep(100);
                 } catch (IOException e) {

@@ -1,43 +1,52 @@
 package com.example.android.bluetoothchat;
 
 import com.example.android.common.logger.Log;
+import com.example.android.utils.DBHelper;
 import com.example.android.utils.NMEA;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 /**
  * Created by mateusz on 14.10.17.
  */
 
-public class SaveToDatabase {
-    private static SaveToDatabase instance = null;
-    private float  cisnienie;
-    private float  temperatura;
-    private int  ax;
-    private int  ay;
-    private int  az;
-    private int  gx;
-    private int  gy;
-    private int  gz;
-    private float  napiecie;
+public class BluetoothDataParser {
+    private static BluetoothDataParser instance = null;
+    public Float szerokoscGeograficzna;
+    public Float  dlugoscGeograficzna;
+    public Date dateFromGPS;
+    public Float kierunek;
+    public Float predkosc;
+    public Float  cisnienie;
+    public Float  temperatura;
+    public Integer  ax;
+    public Integer  ay;
+    public Integer  az;
+    public Integer  gx;
+    public Integer  gy;
+    public Integer  gz;
+    public Float  napiecie;
+    public DBHelper dbHelper = null;
 
 
-    protected SaveToDatabase() {
+    protected BluetoothDataParser() {
 
     }
 
-    public static SaveToDatabase getInstance() {
+    public static BluetoothDataParser getInstance() {
+
         if (instance == null) {
-            instance = new SaveToDatabase();
+            instance = new BluetoothDataParser();
         }
         return instance;
     }
 
 
-    public int addString(String string) {
+    public int addString(String string, DBHelper dbHelper) {
+        this.dbHelper = dbHelper;
         parseString(string);
-        return string.length();
+        if(string.substring(0,30).contains("A")) return 1;
+        else return 0;
     }
 
     private void parseString(String joinedString) {
@@ -66,23 +75,26 @@ public class SaveToDatabase {
             indexOfBegin = joinedString.indexOf(",");
             indexOfEnd = joinedString.indexOf("C",indexOfBegin);
             GPRMC = joinedString.substring(indexOfBegin, indexOfEnd);
-            parseGPRMC(GPRMC);
            // Log.i("GPRMC",GPRMC);
 
             //wydzielenie cisnienia
             indexOfBegin = joinedString.indexOf("C");
             indexOfEnd = joinedString.indexOf("T",indexOfBegin);
             cisnienie = joinedString.substring(indexOfBegin + 1, indexOfEnd);
-            float cisnienieFloat = Float.parseFloat(cisnienie);
-            this.cisnienie = cisnienieFloat / 100;
+            if(!cisnienie.contains("C")) {
+                float cisnienieFloat = Float.parseFloat(cisnienie);
+                this.cisnienie = cisnienieFloat / 100;
+            }
            // Log.i("cisnienie", Float.toString(cisnienieFloat));
 
             //wydzielenie temperatura
             indexOfBegin = joinedString.indexOf("T");
             indexOfEnd = joinedString.indexOf("ax");
             temperatura = joinedString.substring(indexOfBegin + 1, indexOfEnd);
-            float temperaturaFloat = Float.parseFloat(temperatura);
-            this.temperatura = temperaturaFloat/10;
+            if(!temperatura.contains("T")) {
+                float temperaturaFloat = Float.parseFloat(temperatura);
+                this.temperatura = temperaturaFloat / 10;
+            }
            // Log.i("temperatura", Float.toString(this.temperatura));
 
             //wydzielenie ax
@@ -142,10 +154,13 @@ public class SaveToDatabase {
             //wydzielenie napiecia
             indexOfBegin = joinedString.indexOf("V",indexOfEnd);
             voltage = joinedString.substring(indexOfBegin + 1);
-            float voltageFloat = Float.parseFloat(voltage);
-            voltageFloat = voltageFloat * (float) 3.3/1024;
-            this.napiecie = voltageFloat;
+            if(!voltage.contains("V")) {
+                float voltageFloat = Float.parseFloat(voltage);
+                voltageFloat = voltageFloat * (float) 3.3 / 1024;
+                this.napiecie = voltageFloat;
+            }
            // Log.i("napiecie", Float.toString(voltageFloat));
+            parseGPRMC(GPRMC);
         }
         catch (Exception e){
             e.printStackTrace(System.out);
@@ -158,44 +173,30 @@ public class SaveToDatabase {
         NMEA nmea = new NMEA();
         NMEA.GPSPosition gpsPosition;
         gpsPosition =  nmea.parse(gprmc);
-        Log.i("Pozycja GPS",gpsPosition.toString());
+        this.szerokoscGeograficzna = gpsPosition.lat;
+        this.dlugoscGeograficzna = gpsPosition.lon;
+        this.dateFromGPS = gpsPosition.dateFromGps;
+        this.predkosc = gpsPosition.velocity * (float)1.852;
+        this.kierunek = gpsPosition.dir;
+
+        Log.i("Szerokosc GPS", String.valueOf(this.szerokoscGeograficzna));
+        Log.i("Dlugosc GPS", String.valueOf(this.dlugoscGeograficzna));
+        Log.i("Data", String.valueOf(this.dateFromGPS));
+        Log.i("Predkosc", String.valueOf(this.predkosc));
+        Log.i("Kierunek", String.valueOf(this.kierunek));
+        Log.i("Cisnienie", String.valueOf(this.cisnienie));
+        Log.i("Temperatura", String.valueOf(this.temperatura));
+        Log.i("ax", String.valueOf(this.ax));
+        Log.i("ay", String.valueOf(this.ay));
+        Log.i("az", String.valueOf(this.az));
+        Log.i("gx", String.valueOf(this.gx));
+        Log.i("gy", String.valueOf(this.gy));
+        Log.i("gz", String.valueOf(this.gz));
+        Log.i("Napiecie", String.valueOf(this.napiecie));
+        dbHelper.insertData(this);
+
     }
 
-    public float getTemperatura() {
-        return temperatura;
-    }
-
-    public float getAx() {
-        return ax;
-    }
-
-    public float getAy() {
-        return ay;
-    }
-
-    public float getAz() {
-        return az;
-    }
-
-    public float getGx() {
-        return gx;
-    }
-
-    public float getGy() {
-        return gy;
-    }
-
-    public float getGz() {
-        return gz;
-    }
-
-    public float getNapiecie() {
-        return napiecie;
-    }
-
-    public float getCisnienie() {
-        return cisnienie;
-    }
 }
 
 
