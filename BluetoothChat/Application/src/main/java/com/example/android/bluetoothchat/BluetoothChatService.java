@@ -28,6 +28,7 @@ import android.os.SystemClock;
 
 import com.example.android.common.logger.Log;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -463,6 +464,7 @@ public class BluetoothChatService {
         private final BluetoothSocket mmSocket;
         public final InputStream mmInStream;
         public final OutputStream mmOutStream;
+        SaveToDatabase saveToDatabase = null;
 
         public ConnectedThread(BluetoothSocket socket, String socketType) {
             Log.d(TAG, "create ConnectedThread: " + socketType);
@@ -481,23 +483,24 @@ public class BluetoothChatService {
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
             mState = STATE_CONNECTED;
-
         }
 
         public void run() {
+            if(saveToDatabase == null){
+                saveToDatabase = SaveToDatabase.getInstance();
+            }
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
-            int bytes;
+            int size;
             // Keep listening to the InputStream while connected
             while (mState == STATE_CONNECTED) {
                 try {
                     if(mmInStream.available()>0) {
                         // Read from the InputStream
-                        bytes = mmInStream.read(buffer);
-                        // Send the obtained bytes to the UI Activity
-                        mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
-                                .sendToTarget();
-                        new SaveToDatabase(buffer);
+                        DataInputStream dataInputStream = new DataInputStream(mmInStream);
+                        dataInputStream.readFully(buffer,0,180);
+                        //Log.i("Message", new String(buffer));
+                        saveToDatabase.addString(new String(buffer));
                     }
                     else SystemClock.sleep(100);
                 } catch (IOException e) {
