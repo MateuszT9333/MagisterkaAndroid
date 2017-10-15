@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="button_biezacy_szerokosc" type="id" />
+    <item name="button_biezace_data" type="id" />
+    <item name="button_biezace_predkosc" type="id" />
+    <item name="button_biezace_kierunek" type="id" />
+    <item name="text_biezace_cisnienie" type="id" />
+    <item name="text_biezace_temperatura" type="id" />
+    <item name="text_biezace_napiecie" type="id" />
+    <item name="text_napiecie_ax" type="id" />
+    <item name="text_biezace_ay" type="id" />
+    <item name="text_biezace_az" type="id" />
+    <item name="text_biezace_gx" type="id" />
+    <item name="text_biezace_gy" type="id" />
+    <item name="text_biezace_gz" type="id" />
+</resources>

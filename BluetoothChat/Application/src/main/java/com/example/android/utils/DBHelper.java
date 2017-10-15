@@ -96,5 +96,17 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         return array_list;
     }
+    public Cursor getData(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from Data where id="+id+"", null );
+        return res;
+    }
+    public Cursor getLatestData(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "SELECT * \n" +
+                "    FROM    Data\n" +
+                "    WHERE   id = (SELECT MAX(id)  FROM Data)", null );
+        return res;
+    }
 
 }
