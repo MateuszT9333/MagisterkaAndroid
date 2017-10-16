@@ -29,7 +29,7 @@
         <fragment
               android:name="com.example.android.common.logger.LogFragment"
               android:id="@+id/log_fragment"
-              android:layout_width="295dp"
+              android:layout_width="match_parent"
               android:layout_height="match_parent" />
 
     </ViewAnimator>
@@ -41,7 +41,7 @@
 
     <FrameLayout
           android:id="@+id/sample_content_fragment"
-          android:layout_weight="1.32"
+          android:layout_weight="0.43"
           android:layout_width="match_parent"
           android:layout_height="0px" >
 

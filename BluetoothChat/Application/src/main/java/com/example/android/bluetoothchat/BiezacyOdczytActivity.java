@@ -1,21 +1,33 @@
 package com.example.android.bluetoothchat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.app.Activity;
 import android.os.Handler;
+import android.renderscript.Float2;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.common.logger.Log;
 import com.example.android.utils.DBHelper;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static android.R.attr.offset;
 
 public class BiezacyOdczytActivity extends Activity {
     private TextView textView;
     Handler handler = new Handler();
     DBHelper dbHelper = new DBHelper(this);
+    Float offsetAx = new Float(0.0);
+    Float offsetAy = new Float(0.0);
+    Float offsetAz = new Float(0.0);
     BluetoothDataParser bluetoothDataParser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,26 +36,41 @@ public class BiezacyOdczytActivity extends Activity {
         aktualizujPola(dbHelper); // aktualizacja pola
         thread.start();
 
-        final Button button = (Button) findViewById(R.id.button_biezacy_powrot);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-             //   Intent intent = new Intent(, MainActivity.class);
-             //   startActivity(intent);
-            }
-        });
-        final Button button2 = (Button) findViewById(R.id.button_biezacy_dalej);
-        button2.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-//                Intent intent = new Intent(getActivity(), TripActivity.class);
-//                startActivity(intent);
-            }
-        });
-        final Button button3 = (Button) findViewById(R.id.button_biezacy_kalibracja);
-        button3.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Code here executes on main thread after user presses button
-            }
-        });
+    }
+    public void onClickDalej(View v){
+        Intent intent = new Intent(this, LicznikActivity.class);
+        startActivity(intent);
+    }
+    public void onClickKalibracja(View v){ //kalibrorowania akcelerometru
+        textView = (TextView) findViewById(R.id.text_biezace_ax);
+        String num =(String) textView.getText();
+
+        Pattern intsOnly = Pattern.compile("[+-]?([0-9]*[,])?[0-9]+");
+        Matcher makeMatch = intsOnly.matcher(num);
+        makeMatch.find();
+        String result = makeMatch.group().replace(',','.');
+        offsetAx += Float.parseFloat(result);
+
+        textView = (TextView) findViewById(R.id.text_biezace_ay);
+        num =(String) textView.getText();
+
+        intsOnly = Pattern.compile("[+-]?([0-9]*[,])?[0-9]+");
+        makeMatch = intsOnly.matcher(num);
+        makeMatch.find();
+        result = makeMatch.group().replace(',','.');
+        offsetAy += Float.parseFloat(result);
+
+        textView = (TextView) findViewById(R.id.text_biezace_az);
+        num =(String) textView.getText();
+        intsOnly = Pattern.compile("[+-]?([0-9]*[,])?[0-9]+");
+        makeMatch = intsOnly.matcher(num);
+        makeMatch.find();
+        result = makeMatch.group().replace(',','.');
+        offsetAz += Float.parseFloat(result);
+    }
+    public void onClickPowrot(View v){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     Thread thread = new Thread() {
@@ -57,7 +84,7 @@ public class BiezacyOdczytActivity extends Activity {
                             aktualizujPola(dbHelper);
                         }
                     });
-                    Thread.sleep(200);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -113,32 +140,52 @@ public class BiezacyOdczytActivity extends Activity {
         textView.setText("Temperatura: " + text +  " \u00b0" + " C");
     }
     private void aktualizujAx(String text){
+        float skalibrowana = Float.parseFloat(text);
+        if(skalibrowana > 16384 ) skalibrowana=16384;
+        skalibrowana = skalibrowana/16384*90 - offsetAx;
         textView = (TextView) findViewById(R.id.text_biezace_ax);
-        textView.setText("AX: " + text +  " \u00b0");
+        textView.setText("AX: " + String.format("%.2f", skalibrowana )+  " \u00b0");
     }
     private void aktualizujAy(String text){
+        float skalibrowana = Float.parseFloat(text);
+        if(skalibrowana > 16384 ) skalibrowana=16384;
+        skalibrowana = skalibrowana/16384*90 - offsetAy;
         textView = (TextView) findViewById(R.id.text_biezace_ay);
-        textView.setText("AY: " + text +  " \u00b0");
+        textView.setText("AY: " + String.format("%.2f", skalibrowana ) +  " \u00b0");
     }
     private void aktualizujAz(String text){
+        float skalibrowana = Float.parseFloat(text);
+        if(skalibrowana > 16384 ) skalibrowana=16384;
+        skalibrowana = (skalibrowana/16384*90) - offsetAz;
         textView = (TextView) findViewById(R.id.text_biezace_az);
-        textView.setText("AZ: " + text +  " \u00b0");
+        textView.setText("AZ: " + String.format("%.2f", skalibrowana ) +  " \u00b0");
     }
     private void aktualizujGx(String text){
+        float skalibrowana = Float.parseFloat(text);
+        if(skalibrowana > 16384 ) skalibrowana=16384;
+        skalibrowana = skalibrowana/16384*2 + 1;
         textView = (TextView) findViewById(R.id.text_biezace_gx);
-        textView.setText("GX: " + text + " G");
+        textView.setText("GX: " + String.format("%.2f", skalibrowana ) + " G");
     }
     private void aktualizujGy(String text){
+        float skalibrowana = Float.parseFloat(text);
+        if(skalibrowana > 16384 ) skalibrowana=16384;
+        skalibrowana = skalibrowana/16384*2 + 1;
         textView = (TextView) findViewById(R.id.text_biezace_gy);
-        textView.setText("GY: " + text + " G");
+        textView.setText("GY: " + String.format("%.2f", skalibrowana ) + " G");
     }
     private void aktualizujGz(String text){
+        float skalibrowana = Float.parseFloat(text);
+        if(skalibrowana > 16384 ) skalibrowana=16384;
+        skalibrowana = skalibrowana/16384*2 + 1;
         textView = (TextView) findViewById(R.id.text_biezace_gz);
-        textView.setText("GZ:" + text + " G");
+        textView.setText("GZ:" + String.format("%.2f", skalibrowana ) + " G");
     }
     private void aktualizujNapiecie(String text){
+        float skalibrowana = Float.parseFloat(text);
+        skalibrowana = skalibrowana * 3;
         textView = (TextView) findViewById(R.id.text_biezace_napiecie);
-        textView.setText("Napięcie: " + text + " V");
+        textView.setText("Napięcie:\n" + String.format("%.2f", skalibrowana ) + " V");
     }
 
 

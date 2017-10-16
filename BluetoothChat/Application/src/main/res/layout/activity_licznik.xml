@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="visible"
+    tools:context="com.example.android.bluetoothchat.LicznikActivity"
+    tools:layout_editor_absoluteX="0dp"
+    tools:layout_editor_absoluteY="81dp">
+
+    <Button
+        android:id="@+id/button_licznik_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:onClick="resetButtonLicznik"
+        android:text="Reset"
+        app:layout_constraintBottom_toTopOf="@+id/button_licznik_powrot"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1" />
+
+    <Button
+        android:id="@+id/button_licznik_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:onClick="stopButtonLicznik"
+        android:text="Stop"
+        app:layout_constraintBottom_toTopOf="@+id/button_licznik_dalej"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintRight_creator="1" />
+
+    <Button
+        android:id="@+id/button_licznik_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="startButtonLicznik"
+        android:text="Start"
+        app:layout_constraintBaseline_toBaselineOf="@+id/button_licznik_reset"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintBaseline_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1" />
+
+    <Button
+        android:id="@+id/button_licznik_powrot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:onClick="powrotButtonLicznik"
+        android:text="Powrot"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1" />
+
+    <Button
+        android:id="@+id/button_licznik_dalej"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:onClick="dalejButtonLicznik"
+        android:text="Dalej"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/button_licznik_stop"
+        app:layout_constraintRight_toRightOf="@+id/button_licznik_stop"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1" />
+
+    <TextView
+        android:id="@+id/text_licznik_czas"
+        android:layout_width="157dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center_horizontal"
+        android:textSize="@dimen/margin_large"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="@+id/text_licznik_predkosc"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_licznik_predkosc"
+        android:layout_marginRight="32dp" />
+
+    <TextView
+        android:id="@+id/text_licznik_dystans"
+        android:layout_width="155dp"
+        android:layout_height="85dp"
+        android:gravity="center_horizontal"
+        android:textSize="@dimen/margin_large"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="@+id/text_licznik_predkosc_srednia"
+        android:layout_marginTop="111dp"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="114dp"
+        app:layout_constraintTop_toTopOf="@+id/text_licznik_predkosc" />
+
+    <TextView
+        android:id="@+id/text_licznik_predkosc"
+        android:layout_width="147dp"
+        android:layout_height="78dp"
+        android:layout_marginEnd="22dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="22dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="34dp"
+        android:gravity="center_horizontal"
+        android:textSize="@dimen/margin_large"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/text_licznik_czas"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1" />
+
+    <TextView
+        android:id="@+id/text_licznik_predkosc_srednia"
+        android:layout_width="139dp"
+        android:layout_height="0dp"
+        android:gravity="center_horizontal"
+        android:textSize="@dimen/margin_large"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/text_licznik_predkosc_max"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_licznik_predkosc_max"
+        android:layout_marginLeft="16dp" />
+
+    <TextView
+        android:id="@+id/text_licznik_predkosc_max"
+        android:layout_width="146dp"
+        android:layout_height="94dp"
+        android:layout_marginBottom="30dp"
+        android:gravity="center_horizontal"
+        android:textSize="@dimen/margin_large"
+        app:layout_constraintBottom_toTopOf="@+id/button_licznik_stop"
+        app:layout_constraintLeft_toLeftOf="@+id/button_licznik_stop"
+        app:layout_constraintRight_toLeftOf="@+id/button_licznik_stop"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        app:layout_constraintHorizontal_bias="0.497" />
+</android.support.constraint.ConstraintLayout>

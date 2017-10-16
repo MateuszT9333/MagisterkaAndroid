@@ -31,6 +31,7 @@
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:launchMode="singleTask"
             android:label="SystemTelemetryczny">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,7 +46,10 @@
             android:theme="@android:style/Theme.Holo.Dialog" />
         <activity
             android:name=".BiezacyOdczytActivity"
-            android:label="Biezacy Odczyt"></activity>
+            android:label="Bieżacy odczyt" />
+        <activity
+            android:name= ".LicznikActivity"
+            android:label="Licznik rowerowy" />
     </application>
 
 </manifest>
