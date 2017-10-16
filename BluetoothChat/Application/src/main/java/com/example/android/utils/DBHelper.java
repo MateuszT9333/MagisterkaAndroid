@@ -34,6 +34,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String BLUETOOTH_COLUMN_GY = "gy";
     public static final String BLUETOOTH_COLUMN_GZ = "gz";
     public static final String BLUETOOTH_COLUMN_NAPIECIE = "napiecie";
+    public boolean isLatestData;
 
 
     public DBHelper(Context context){
@@ -106,6 +107,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor res =  db.rawQuery( "SELECT * \n" +
                 "    FROM    Data\n" +
                 "    WHERE   id = (SELECT MAX(id)  FROM Data)", null );
+        isLatestData = true;
         return res;
     }
 

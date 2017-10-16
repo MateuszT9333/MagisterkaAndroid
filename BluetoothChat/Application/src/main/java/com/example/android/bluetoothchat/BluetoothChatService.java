@@ -508,14 +508,9 @@ public class BluetoothChatService {
                     if(mmInStream.available()>0) {
                         // Read from the InputStream
                         DataInputStream dataInputStream = new DataInputStream(mmInStream);
-                        if(dataNMEA == 0) {
-                            dataInputStream.readFully(buffer, 0, 200);
-                        }else{
-                            dataInputStream.readFully(buffer, 0, 300);
-                        }
-                        //Log.i("Message", new String(buffer));
-                        dataNMEA = bluetoothDataParser.addString(new String(buffer), dbHelper);
-                        Log.i("Liczba wierszy", String.valueOf(dbHelper.numberOfRows()));
+                         size = mmInStream.read(buffer);
+                         bluetoothDataParser.addString(new String(buffer,0,size), dbHelper);
+                       // Log.i("Data",new String(buffer,0,size));
                     }
                     else SystemClock.sleep(100);
                 } catch (IOException e) {

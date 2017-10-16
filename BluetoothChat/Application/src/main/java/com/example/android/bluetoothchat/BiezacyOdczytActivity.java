@@ -1,8 +1,12 @@
 package com.example.android.bluetoothchat;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.app.Activity;
+import android.os.Handler;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.android.common.logger.Log;
@@ -10,14 +14,56 @@ import com.example.android.utils.DBHelper;
 
 public class BiezacyOdczytActivity extends Activity {
     private TextView textView;
+    Handler handler = new Handler();
+    DBHelper dbHelper = new DBHelper(this);
     BluetoothDataParser bluetoothDataParser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DBHelper dbHelper = new DBHelper(this);
         setContentView(R.layout.biezacyodczyt);
         aktualizujPola(dbHelper); // aktualizacja pola
+        thread.start();
+
+        final Button button = (Button) findViewById(R.id.button_biezacy_powrot);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+             //   Intent intent = new Intent(, MainActivity.class);
+             //   startActivity(intent);
+            }
+        });
+        final Button button2 = (Button) findViewById(R.id.button_biezacy_dalej);
+        button2.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+//                Intent intent = new Intent(getActivity(), TripActivity.class);
+//                startActivity(intent);
+            }
+        });
+        final Button button3 = (Button) findViewById(R.id.button_biezacy_kalibracja);
+        button3.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Code here executes on main thread after user presses button
+            }
+        });
     }
+
+    Thread thread = new Thread() {
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            aktualizujPola(dbHelper);
+                        }
+                    });
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
 
     private void aktualizujPola(DBHelper dbHelper) {
         Cursor rs = dbHelper.getLatestData(); //odczytaj ostatni rekord z bazy danych
