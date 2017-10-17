@@ -28,17 +28,35 @@ public class BiezacyOdczytActivity extends Activity {
     Float offsetAx = new Float(0.0);
     Float offsetAy = new Float(0.0);
     Float offsetAz = new Float(0.0);
+    String dlugoscGeograficzna;
     BluetoothDataParser bluetoothDataParser;
+    private String szerokoscGeograficzna;
+    private String ax;
+    private String ay;
+    private String az;
+    private String cisnienie;
+    private String data;
+    private String gx;
+    private String gy;
+    private String gz;
+    private String kierunek;
+    private String napiecie;
+    private String predkosc;
+    private String temperature;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.biezacyodczyt);
-        aktualizujPola(dbHelper); // aktualizacja pola
+        zapytajODane(dbHelper);
+        aktualizujPola(); // aktualizacja pola
         thread.start();
+        threadSQL.start();
 
     }
     public void onClickDalej(View v){
         thread.interrupt();
+        threadSQL.interrupt();
         Intent intent = new Intent(this, LicznikActivity.class);
         startActivity(intent);
     }
@@ -71,6 +89,7 @@ public class BiezacyOdczytActivity extends Activity {
     }
     public void onClickPowrot(View v){
         thread.interrupt();
+        threadSQL.interrupt();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
@@ -83,8 +102,25 @@ public class BiezacyOdczytActivity extends Activity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
-                            aktualizujPola(dbHelper);
+                            aktualizujPola();
+                        }
+                    });
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
+    Thread threadSQL = new Thread() {
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            zapytajODane(dbHelper);
                         }
                     });
                     Thread.sleep(500);
@@ -95,97 +131,116 @@ public class BiezacyOdczytActivity extends Activity {
         }
     };
 
-    private void aktualizujPola(DBHelper dbHelper) {
+    private void zapytajODane(DBHelper dbHelper) {
         Cursor rs = dbHelper.getLatestData(); //odczytaj ostatni rekord z bazy danych
         rs.moveToFirst();
 
-        aktualizujSzerokoscGeograficzna(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_SZEROKOSCGEOGRAFICZNA)));
-        aktualizujDlugoscGeograficzna(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_DLUGOSCGEOGRAFICZNA)));
-        aktualizujAx(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_AX)));
-        aktualizujAy(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_AY)));
-        aktualizujAz(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_AZ)));
-        aktualizujCisnienie(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_CISNIENIE)));
-        aktualizujDate(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_DATA)));
-        aktualizujGx(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_GX)));
-        aktualizujGy(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_GY)));
-        aktualizujGz(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_GZ)));
-        aktualizujKierunek(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_KIERUNEK)));
-        aktualizujNapiecie(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_NAPIECIE)));
-        aktualizujPredkosc(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_PREDKOSC)));
-        aktualizujTemperature(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_TEMPERATURA)));
+        dlugoscGeograficzna = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_SZEROKOSCGEOGRAFICZNA));
+        szerokoscGeograficzna = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_DLUGOSCGEOGRAFICZNA));
+        ax = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_AX));
+        ay = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_AY));
+        az = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_AZ));
+        cisnienie = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_CISNIENIE));
+        data = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_DATA));
+        gx = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_GX));
+        gy = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_GY));
+        gz = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_GZ));
+        kierunek = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_KIERUNEK));
+        napiecie = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_NAPIECIE));
+        predkosc = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_PREDKOSC));
+        temperature = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_TEMPERATURA));
+
     }
-    private void aktualizujDlugoscGeograficzna(String text){
+
+    private void aktualizujPola() {
+
+        aktualizujSzerokoscGeograficzna();
+        aktualizujDlugoscGeograficzna();
+        aktualizujAx();
+        aktualizujAy();
+        aktualizujAz();
+        aktualizujCisnienie();
+        aktualizujDate();
+        aktualizujGx();
+        aktualizujGy();
+        aktualizujGz();
+        aktualizujKierunek();
+        aktualizujNapiecie();
+        aktualizujPredkosc();
+        aktualizujTemperature();
+    }
+    private void aktualizujDlugoscGeograficzna(){
         textView = (TextView) findViewById(R.id.text_biezace_dlugosc);
-        textView.setText("Szerokosc: " + text);
+        textView.setText("Szerokosc: " + dlugoscGeograficzna);
     }
-    private void aktualizujSzerokoscGeograficzna(String text){
+    private void aktualizujSzerokoscGeograficzna(){
         textView = (TextView) findViewById(R.id.text_biezace_szerokosc);
-        textView.setText("Długość: " + text);
+        textView.setText("Długość: " + szerokoscGeograficzna);
     }
-    private void aktualizujDate(String text){
+    private void aktualizujDate(){
         textView = (TextView) findViewById(R.id.text_biezace_data);
-        textView.setText("Data: " + text);
+        textView.setText("Data: " + data);
     }
-    private void aktualizujKierunek(String text){
+    private void aktualizujKierunek(){
         textView = (TextView) findViewById(R.id.text_biezace_kierunek);
-        textView.setText("Kierunek: " + text + " \u00b0");
+        textView.setText("Kierunek: " + kierunek + " \u00b0");
     }
-    private void aktualizujPredkosc(String text){
+    private void aktualizujPredkosc(){
         textView = (TextView) findViewById(R.id.text_biezace_predkosc);
-        textView.setText("Prędkość: " +text + " km/h");
+        textView.setText("Prędkość: " +predkosc + " km/h");
     }
-    private void aktualizujCisnienie(String text){
+    private void aktualizujCisnienie(){
         textView = (TextView) findViewById(R.id.text_biezace_cisnienie);
-        textView.setText("Ciśnienie: " + text + " hPA");
+        textView.setText("Ciśnienie: " + cisnienie + " hPA");
     }
-    private void aktualizujTemperature(String text){
+    private void aktualizujTemperature(){
         textView = (TextView) findViewById(R.id.text_biezace_temperatura);
-        textView.setText("Temperatura: " + text +  " \u00b0" + " C");
+        textView.setText("Temperatura: " + temperature +  " \u00b0" + " C");
     }
-    private void aktualizujAx(String text){
-        float skalibrowana = Float.parseFloat(text);
+    private void aktualizujAx(){
+        float skalibrowana = Float.parseFloat(ax);
         if(skalibrowana > 16384 ) skalibrowana=16384;
         skalibrowana = skalibrowana/16384*90 - offsetAx;
         textView = (TextView) findViewById(R.id.text_biezace_ax);
         textView.setText("AX: " + String.format("%.2f", skalibrowana )+  " \u00b0");
     }
-    private void aktualizujAy(String text){
-        float skalibrowana = Float.parseFloat(text);
+    private void aktualizujAy(){
+        float skalibrowana = Float.parseFloat(ay);
         if(skalibrowana > 16384 ) skalibrowana=16384;
         skalibrowana = skalibrowana/16384*90 - offsetAy;
         textView = (TextView) findViewById(R.id.text_biezace_ay);
         textView.setText("AY: " + String.format("%.2f", skalibrowana ) +  " \u00b0");
     }
-    private void aktualizujAz(String text){
-        float skalibrowana = Float.parseFloat(text);
+    private void aktualizujAz(){
+        float skalibrowana = Float.parseFloat(az);
         if(skalibrowana > 16384 ) skalibrowana=16384;
         skalibrowana = (skalibrowana/16384*90) - offsetAz;
         textView = (TextView) findViewById(R.id.text_biezace_az);
         textView.setText("AZ: " + String.format("%.2f", skalibrowana ) +  " \u00b0");
     }
-    private void aktualizujGx(String text){
-        float skalibrowana = Float.parseFloat(text);
+    private void aktualizujGx(){
+        float skalibrowana = Float.parseFloat(gx);
         if(skalibrowana > 16384 ) skalibrowana=16384;
         skalibrowana = skalibrowana/16384*2 + 1;
         textView = (TextView) findViewById(R.id.text_biezace_gx);
         textView.setText("GX: " + String.format("%.2f", skalibrowana ) + " G");
     }
-    private void aktualizujGy(String text){
-        float skalibrowana = Float.parseFloat(text);
+    private void aktualizujGy(){
+        float skalibrowana = Float.parseFloat(gy);
         if(skalibrowana > 16384 ) skalibrowana=16384;
         skalibrowana = skalibrowana/16384*2 + 1;
         textView = (TextView) findViewById(R.id.text_biezace_gy);
         textView.setText("GY: " + String.format("%.2f", skalibrowana ) + " G");
     }
-    private void aktualizujGz(String text){
-        float skalibrowana = Float.parseFloat(text);
+    private void aktualizujGz(){
+        float skalibrowana = Float.parseFloat(gz);
         if(skalibrowana > 16384 ) skalibrowana=16384;
         skalibrowana = skalibrowana/16384*2 + 1;
         textView = (TextView) findViewById(R.id.text_biezace_gz);
         textView.setText("GZ:" + String.format("%.2f", skalibrowana ) + " G");
     }
-    private void aktualizujNapiecie(String text){
-        float skalibrowana = Float.parseFloat(text);
+    private void aktualizujNapiecie(){
+        float skalibrowana = Float.parseFloat(napiecie);
         skalibrowana = skalibrowana * 3;
         textView = (TextView) findViewById(R.id.text_biezace_napiecie);
         textView.setText("Napięcie:\n" + String.format("%.2f", skalibrowana ) + " V");
