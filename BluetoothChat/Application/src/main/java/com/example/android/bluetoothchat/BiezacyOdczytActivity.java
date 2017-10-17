@@ -271,7 +271,7 @@ public class BiezacyOdczytActivity extends Activity {
     }
     private void aktualizujNapiecie(){
         float skalibrowana = Float.parseFloat(napiecie);
-        skalibrowana = skalibrowana * 3;
+        skalibrowana = skalibrowana * (float) 3.66;
         textView = (TextView) findViewById(R.id.text_biezace_napiecie);
         textView.setText("Nap:\n" + String.format("%.2f", skalibrowana ) + " V");
     }

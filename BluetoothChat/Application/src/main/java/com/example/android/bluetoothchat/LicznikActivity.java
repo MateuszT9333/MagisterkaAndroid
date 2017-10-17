@@ -27,12 +27,11 @@ public class LicznikActivity extends Activity {
     private long czasJazdyWSekundach = 0;
     private Float predkoscMax = (float)0;
     private boolean tripIsStopped = false;
-    private boolean tripIsReset = false;
     private boolean databaseUpdate = true;
     private Float predkoscChwilowa = (float)0;
     private static LicznikSavedInstance licznikSavedInstance;
-    private boolean nowaPredkoscChwilowa = false;
     private int newId;
+    private Float predkoscSrednia =(float) 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,7 +135,6 @@ public class LicznikActivity extends Activity {
                             if(databaseUpdate) {
 //                                Log.i("Wiadomosc", "aktualizujPola");
                                 aktualizujPola();
-                                nowaPredkoscChwilowa = false;
                             }
                         }
                     });
@@ -156,6 +154,7 @@ public class LicznikActivity extends Activity {
                         @Override
                         public void run() {
                                 databaseUpdate = isDatabaseUpdate();
+//                            Log.e("Stopped", String.valueOf(tripIsStopped));
 
                         }
                     });
@@ -178,8 +177,7 @@ public class LicznikActivity extends Activity {
                                 Cursor rs = dbHelper.getLatestData(); //odczytaj ostatni rekord z bazy danych
                                 rs.moveToFirst();
                                 predkoscChwilowa = aktualizujPredkosc(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_PREDKOSC)));
-                                nowaPredkoscChwilowa = true;
-                                Log.i("Wiadomosc", "nowaPredkoscChwilowa");
+//                                Log.i("Wiadomosc", "nowaPredkoscChwilowa");
                             }
                         }
                     });
@@ -212,7 +210,6 @@ public class LicznikActivity extends Activity {
             idStartu = getLatestId();
         }
         tripIsStopped = false;
-        tripIsReset = false;
 
     }
 
@@ -227,11 +224,9 @@ public class LicznikActivity extends Activity {
             return;
         }
         tripIsStopped = true;
-        tripIsReset = false;
     }
 
     public void resetButtonLicznik(View v) {
-        tripIsReset = true;
         tripIsEnabled = false;
         this.przejechanyDystansWKilometrach =(float) 0.0;
         this.predkoscMax=(float) 0.0;
@@ -251,9 +246,12 @@ public class LicznikActivity extends Activity {
 
     private void aktualizujPola()  {
         if(tripIsStopped){
-            return; //zamrazanie widoku
+            zamrozDystans();
+            zamrozPredkoscSrednia();
+            zamrozPredkoscMax();
+            zamrozCzasJazdy();
         }
-        if(tripIsEnabled) {
+        else if(tripIsEnabled) {
             aktualizujDystans();
             aktualizujPredkoscSrednia();
             aktualizujPredkoscMax();
@@ -264,34 +262,52 @@ public class LicznikActivity extends Activity {
             aktualizujPustaPredkoscMax();
             aktualizujPustaCzasJazdy();
         }
-        if(tripIsReset){
-            aktualizujPustyDystans();
-            aktualizujPustaPredkoscSrednia();
-            aktualizujPustaPredkoscMax();
-            aktualizujPustaCzasJazdy();
-        }
         aktualizujTextViewGPS();
 
     }
+
 
     private void aktualizujPustaCzasJazdy() {
         textView = (TextView) findViewById(R.id.text_licznik_czas);
         textView.setText("TIME: " + "0:0:0" );
     }
+    private void zamrozCzasJazdy() {
+        Calendar czasJazdy = Calendar.getInstance();
+        czasJazdy.setTimeInMillis(czasJazdyWSekundach * 1000);
 
+        int hours = czasJazdy.get(Calendar.HOUR);
+        if(hours == 1) hours=0; //TODO usun
+        int minutes = czasJazdy.get(Calendar.MINUTE);
+        int seconds = czasJazdy.get(Calendar.SECOND);
+
+        textView = (TextView) findViewById(R.id.text_licznik_czas);
+        textView.setText("TIME: " + hours + ":" + minutes + ":" + seconds);
+    }
     private void aktualizujPustaPredkoscMax() {
         textView = (TextView) findViewById(R.id.text_licznik_predkosc_max);
         textView.setText("MAX: " + "0 km/h");
+    }
+    private void zamrozPredkoscMax() {
+        textView = (TextView) findViewById(R.id.text_licznik_predkosc_max);
+        textView.setText("MAX: " + String.format("%.2f", predkoscMax) + " km/h");
     }
 
     private void aktualizujPustaPredkoscSrednia() {
         textView = (TextView) findViewById(R.id.text_licznik_predkosc_srednia);
         textView.setText("AVG: " + "0 km/h");
     }
+    private void zamrozPredkoscSrednia() {
+        textView = (TextView) findViewById(R.id.text_licznik_predkosc_srednia);
+        textView.setText("AVG: " + String.format("%.2f", predkoscSrednia) +  " km/h");
+    }
 
     private void aktualizujPustyDystans() {
         textView = (TextView) findViewById(R.id.text_licznik_dystans);
         textView.setText("DIS: " + "0 km");
+    }
+    private void zamrozDystans() {
+        textView = (TextView) findViewById(R.id.text_licznik_dystans);
+        textView.setText("DIS: " + String.format("%.3f", przejechanyDystansWKilometrach) + " km");
     }
 
     private void aktualizujTextViewGPS() {
@@ -320,6 +336,7 @@ public class LicznikActivity extends Activity {
 
     }
 
+
     private void aktualizujPredkoscMax() {
         if(predkoscChwilowa > predkoscMax){
             predkoscMax = predkoscChwilowa;
@@ -331,6 +348,7 @@ public class LicznikActivity extends Activity {
     private void aktualizujPredkoscSrednia() {
         Float predkoscSrednia = (przejechanyDystansWKilometrach * 1000) / czasJazdyWSekundach; //metry na sekunde
         predkoscSrednia = predkoscSrednia /(float) 3.6;
+        this.predkoscSrednia = predkoscSrednia;
         textView = (TextView) findViewById(R.id.text_licznik_predkosc_srednia);
         textView.setText("AVG: " + String.format("%.2f", predkoscSrednia) +  " km/h");
     }
@@ -346,7 +364,7 @@ public class LicznikActivity extends Activity {
     private Float aktualizujPredkosc(String text){
         float predkosc = Float.parseFloat(text);
         textView = (TextView) findViewById(R.id.text_licznik_predkosc);
-        textView.setText("SPD: " + String.format("%.3f", predkosc) + " km/h");
+        textView.setText("SPD: " + String.format("%.2f", predkosc) + " km/h");
         return Float.parseFloat(text);
     }
 

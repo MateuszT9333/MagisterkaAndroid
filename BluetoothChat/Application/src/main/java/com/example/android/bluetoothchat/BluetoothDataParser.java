@@ -234,7 +234,7 @@ public class BluetoothDataParser {
 //        Log.i("gy", String.valueOf(this.gy));
 //        Log.i("gz", String.valueOf(this.gz));
 //        Log.i("Napiecie", String.valueOf(this.napiecie));
-        Log.i("isGPS", this.isGPS);
+//        Log.i("isGPS", this.isGPS);
         dbHelper.insertData(this);
 
     }
