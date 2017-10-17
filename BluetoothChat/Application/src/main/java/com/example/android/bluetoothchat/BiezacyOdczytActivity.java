@@ -38,6 +38,7 @@ public class BiezacyOdczytActivity extends Activity {
 
     }
     public void onClickDalej(View v){
+        thread.interrupt();
         Intent intent = new Intent(this, LicznikActivity.class);
         startActivity(intent);
     }
@@ -69,6 +70,7 @@ public class BiezacyOdczytActivity extends Activity {
         offsetAz += Float.parseFloat(result);
     }
     public void onClickPowrot(View v){
+        thread.interrupt();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
@@ -81,6 +83,7 @@ public class BiezacyOdczytActivity extends Activity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             aktualizujPola(dbHelper);
                         }
                     });

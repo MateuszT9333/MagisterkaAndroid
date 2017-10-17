@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.example.android.bluetoothchat.BluetoothDataParser;
 import com.example.android.bluetoothchat.Constants;
@@ -111,4 +112,11 @@ public class DBHelper extends SQLiteOpenHelper {
         return res;
     }
 
+    public Cursor getLatestId() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "SELECT id \n" +
+                "    FROM    Data\n" +
+                "    WHERE   id = (SELECT MAX(id)  FROM Data)", null );
+        return res;
+    }
 }

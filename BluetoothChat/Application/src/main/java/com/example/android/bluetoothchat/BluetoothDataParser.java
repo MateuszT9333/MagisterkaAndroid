@@ -4,6 +4,9 @@ import com.example.android.common.logger.Log;
 import com.example.android.utils.DBHelper;
 import com.example.android.utils.NMEA;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -15,7 +18,7 @@ public class BluetoothDataParser {
     private static BluetoothDataParser instance = null;
     public Float szerokoscGeograficzna;
     public Float  dlugoscGeograficzna;
-    public Date dateFromGPS;
+    public String dateFromGPS;
     public Float kierunek;
     public Float predkosc;
     public Float  cisnienie;
@@ -214,6 +217,7 @@ public class BluetoothDataParser {
         this.predkosc = gpsPosition.velocity * (float)1.852;
         this.kierunek = gpsPosition.dir;
 
+//        Log.i("Data", String.valueOf(dateFromGPS));
 //        Log.i("Szerokosc GPS", String.valueOf(this.szerokoscGeograficzna));
 //        Log.i("Dlugosc GPS", String.valueOf(this.dlugoscGeograficzna));
 //        Log.i("Data", String.valueOf(this.dateFromGPS));

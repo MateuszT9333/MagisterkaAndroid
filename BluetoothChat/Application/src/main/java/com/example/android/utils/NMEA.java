@@ -7,6 +7,7 @@ import com.example.android.common.logger.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,12 +74,23 @@ public class NMEA {
             String dataString = rok + dataDelimiter + miesiac + dataDelimiter + dzien + " " +
                     godzina + timeDelimiter + minuta + timeDelimiter + sekunda;
 
+            position.dateFromGps = dataString; //Data w formacie yy-mm-dd hh:mm:ss
             SimpleDateFormat formatter = new SimpleDateFormat("yy-mm-dd hh:mm:ss");
             try{
-                position.dateFromGps = formatter.parse(dataString);
+                formatter.parse(dataString);
             }catch (ParseException e){
-                position.dateFromGps = null;
                 e.printStackTrace();
+                Date today = Calendar.getInstance().getTime();
+                position.dateFromGps = formatter.format(today);
+            }
+            if(position.dateFromGps.equals("0-0-0 0:0:0")){
+                Date today = Calendar.getInstance().getTime();
+                position.dateFromGps = formatter.format(today);
+            }
+            String dzienMiesiacRok = position.dateFromGps.substring(0,position.dateFromGps.indexOf(" "));
+            if(dzienMiesiacRok.equals("0-0-0")){
+                Date today = Calendar.getInstance().getTime();
+                position.dateFromGps = formatter.format(today);
             }
             return true;
         }
@@ -97,7 +109,7 @@ public class NMEA {
         public void updatefix() {
             fixed = quality > 0;
         }
-        public Date dateFromGps = new Date();
+        public String dateFromGps;
 
         public String toString() {
             return String.format("POSITION: lat: %f, lon: %f, time: %f,day %f,dir: %f, vel: %f", lat, lon, time, day, dir, velocity);
