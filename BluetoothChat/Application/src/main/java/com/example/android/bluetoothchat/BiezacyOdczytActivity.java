@@ -106,7 +106,7 @@ public class BiezacyOdczytActivity extends Activity {
                         }
                     });
                     Thread.sleep(500);
-                    Log.i("Biezacy odczyt watek", "pola zaktualizowane");
+//                    Log.i("Biezacy odczyt watek", "pola zaktualizowane");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     Thread.currentThread().isInterrupted();
@@ -126,7 +126,7 @@ public class BiezacyOdczytActivity extends Activity {
                         }
                     });
                     Thread.sleep(500);
-                    Log.i("Biezacy odczyt watek", "zapytanie o dane");
+//                    Log.i("Biezacy odczyt watek", "zapytanie o dane");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     Thread.currentThread().isInterrupted();
@@ -172,6 +172,27 @@ public class BiezacyOdczytActivity extends Activity {
         aktualizujNapiecie();
         aktualizujPredkosc();
         aktualizujTemperature();
+        aktualizujTextViewGPS();
+    }
+
+    private void aktualizujTextViewGPS() {
+        TextView textViewGPS = (TextView) findViewById(R.id.text_biezacy_isGPS);
+        if(isGPS()){
+            textViewGPS.setText("GPS OK");
+        }else{
+            textViewGPS.setText("NO GPS!");
+        }
+    }
+    private boolean isGPS(){
+        Cursor rs = dbHelper.getLatestData(); //odczytaj ostatni rekord z bazy danych
+        rs.moveToFirst();
+        String isGPS = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_IS_GPS));
+        boolean isValidGPS = isGPS.equals("A");
+        if(isValidGPS){
+            return true;
+        }else{
+            return false;
+        }
     }
     private void aktualizujDlugoscGeograficzna(){
         textView = (TextView) findViewById(R.id.text_biezace_dlugosc);
@@ -187,19 +208,24 @@ public class BiezacyOdczytActivity extends Activity {
     }
     private void aktualizujKierunek(){
         textView = (TextView) findViewById(R.id.text_biezace_kierunek);
-        textView.setText("Kierunek: " + kierunek + " \u00b0");
+        textView.setText("Kier: " + kierunek + " \u00b0");
     }
     private void aktualizujPredkosc(){
+        float predkoscChwilowa = Float.parseFloat(predkosc);
         textView = (TextView) findViewById(R.id.text_biezace_predkosc);
-        textView.setText("Prędkość: " +predkosc + " km/h");
+        textView.setText("Prędk: " +String.format("%.3f", predkoscChwilowa) + " km/h");
     }
     private void aktualizujCisnienie(){
         textView = (TextView) findViewById(R.id.text_biezace_cisnienie);
-        textView.setText("Ciśnienie: " + cisnienie + " hPA");
+        textView.setText("Ciśn: " + cisnienie + " hPA");
     }
     private void aktualizujTemperature(){
         textView = (TextView) findViewById(R.id.text_biezace_temperatura);
-        textView.setText("Temperatura: " + temperature +  " \u00b0" + " C");
+        if(temperature.contains("Inf")){
+            textView.setText("Temp:\n " + "0.0" +  " \u00b0" + " C");
+        }else {
+            textView.setText("Temp:\n " + temperature + " \u00b0" + " C");
+        }
     }
     private void aktualizujAx(){
         float skalibrowana = Float.parseFloat(ax);
@@ -247,7 +273,7 @@ public class BiezacyOdczytActivity extends Activity {
         float skalibrowana = Float.parseFloat(napiecie);
         skalibrowana = skalibrowana * 3;
         textView = (TextView) findViewById(R.id.text_biezace_napiecie);
-        textView.setText("Napięcie:\n" + String.format("%.2f", skalibrowana ) + " V");
+        textView.setText("Nap:\n" + String.format("%.2f", skalibrowana ) + " V");
     }
 
 

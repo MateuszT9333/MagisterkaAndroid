@@ -35,6 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String BLUETOOTH_COLUMN_GY = "gy";
     public static final String BLUETOOTH_COLUMN_GZ = "gz";
     public static final String BLUETOOTH_COLUMN_NAPIECIE = "napiecie";
+    public static final String BLUETOOTH_COLUMN_IS_GPS = "isGPS";
     public boolean isLatestData;
 
 
@@ -50,7 +51,7 @@ public class DBHelper extends SQLiteOpenHelper {
                         "(id integer primary key autoincrement, szerokosc real,dlugosc real,"+
                         "data text, kierunek real,predkosc real,cisnienie real, temperatura real,"+
                         "ax integer, ay integer, az integer, gx integer, gy integer, gz integer,"+
-                        "napiecie real)"
+                        "napiecie real, isGPS text)"
         );
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -75,6 +76,7 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put("gy", String.valueOf(bluetoothDataParser.gy));
         contentValues.put("gz", String.valueOf(bluetoothDataParser.gz));
         contentValues.put("napiecie", String.valueOf(bluetoothDataParser.napiecie));
+        contentValues.put("isGPS", bluetoothDataParser.isGPS);
         db.insert(BLUETOOTH_TABLE_NAME, null, contentValues);
         return true;
 
@@ -101,6 +103,15 @@ public class DBHelper extends SQLiteOpenHelper {
     public Cursor getData(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from Data where id="+id+"", null );
+
+        return res;
+    }
+    public Cursor getDataAsArray(int id) {
+        ArrayList<String> array_list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from Data where id="+id+"", null );
+        res.moveToFirst();
+
         return res;
     }
     public Cursor getLatestData(){

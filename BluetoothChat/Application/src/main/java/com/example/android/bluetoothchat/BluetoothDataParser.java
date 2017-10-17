@@ -34,6 +34,7 @@ public class BluetoothDataParser {
     public DBHelper dbHelper = null;
     ArrayList<String> listOfStrings = null;
     ArrayList<String> bufferOfStrings = null;
+    public String isGPS;
 
 
     protected BluetoothDataParser() {
@@ -216,6 +217,7 @@ public class BluetoothDataParser {
         this.dateFromGPS = gpsPosition.dateFromGps;
         this.predkosc = gpsPosition.velocity * (float)1.852;
         this.kierunek = gpsPosition.dir;
+        this.isGPS = gpsPosition.isGPS;
 
 //        Log.i("Data", String.valueOf(dateFromGPS));
 //        Log.i("Szerokosc GPS", String.valueOf(this.szerokoscGeograficzna));
@@ -232,6 +234,7 @@ public class BluetoothDataParser {
 //        Log.i("gy", String.valueOf(this.gy));
 //        Log.i("gz", String.valueOf(this.gz));
 //        Log.i("Napiecie", String.valueOf(this.napiecie));
+        Log.i("isGPS", this.isGPS);
         dbHelper.insertData(this);
 
     }

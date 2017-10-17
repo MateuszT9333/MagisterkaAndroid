@@ -134,7 +134,7 @@ public class LicznikActivity extends Activity {
                         @Override
                         public void run() {
                             if(databaseUpdate) {
-                                Log.i("Wiadomosc", "aktualizujPola");
+//                                Log.i("Wiadomosc", "aktualizujPola");
                                 aktualizujPola();
                                 nowaPredkoscChwilowa = false;
                             }
@@ -193,14 +193,14 @@ public class LicznikActivity extends Activity {
 
     private boolean isDatabaseUpdate() {
         newId = getLatestId();
-        Log.i("Wiadomosc", "czyBazaUpdatowana?");
-        Log.e("NEW ID", String.valueOf(newId));
-        Log.e("OLD ID", String.valueOf(oldId));
+//        Log.i("Wiadomosc", "czyBazaUpdatowana?");
+//        Log.e("NEW ID", String.valueOf(newId));
+//        Log.e("OLD ID", String.valueOf(oldId));
         if(newId == oldId){
-            Log.e("Bazaupdatowana?", "NIE");
+//            Log.e("Bazaupdatowana?", "NIE");
             return false;
         }else{
-            Log.e("Bazaupdatowana?", "TAK");
+//            Log.e("Bazaupdatowana?", "TAK");
             oldId = newId;
             return true;
         }
@@ -211,7 +211,8 @@ public class LicznikActivity extends Activity {
         if(!tripIsStopped) {
             idStartu = getLatestId();
         }
-        tripIsStopped=false;
+        tripIsStopped = false;
+        tripIsReset = false;
 
     }
 
@@ -226,6 +227,7 @@ public class LicznikActivity extends Activity {
             return;
         }
         tripIsStopped = true;
+        tripIsReset = false;
     }
 
     public void resetButtonLicznik(View v) {
@@ -243,6 +245,8 @@ public class LicznikActivity extends Activity {
     }
 
     public void dalejButtonLicznik(View v) {
+        Intent intent = new Intent(this, HistoriaActivity.class);
+        startActivity(intent);
     }
 
     private void aktualizujPola()  {
@@ -265,7 +269,6 @@ public class LicznikActivity extends Activity {
             aktualizujPustaPredkoscSrednia();
             aktualizujPustaPredkoscMax();
             aktualizujPustaCzasJazdy();
-            tripIsReset=false;
         }
         aktualizujTextViewGPS();
 
@@ -341,19 +344,18 @@ public class LicznikActivity extends Activity {
     }
 
     private Float aktualizujPredkosc(String text){
+        float predkosc = Float.parseFloat(text);
         textView = (TextView) findViewById(R.id.text_licznik_predkosc);
-        textView.setText("SPD: " + text + " km/h");
+        textView.setText("SPD: " + String.format("%.3f", predkosc) + " km/h");
         return Float.parseFloat(text);
     }
 
     private boolean isGPS(){
         Cursor rs = dbHelper.getLatestData(); //odczytaj ostatni rekord z bazy danych
         rs.moveToFirst();
-        String dlugosc = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_DLUGOSCGEOGRAFICZNA));
-        String szerokosc = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_SZEROKOSCGEOGRAFICZNA));
-        boolean isValidDlugosc = !dlugosc.equals("0");
-        boolean isValidSzerokosc = !szerokosc.equals("0");
-        if(isValidDlugosc && isValidSzerokosc){
+        String isGPS = rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_IS_GPS));
+        boolean isValidGPS = isGPS.equals("A");
+        if(isValidGPS){
             return true;
         }else{
             return false;

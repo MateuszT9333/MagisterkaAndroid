@@ -43,6 +43,9 @@ public class NMEA {
             if (!tokens[1].equals("")) {
                 position.time = Float.parseFloat(tokens[1]);
             }
+            if (!(tokens[2].equals(""))) {
+                position.isGPS = tokens[2];
+            }
             if (!((tokens[3].equals("")) || (tokens[4].equals("")))) {
                 position.lat = Latitude2Decimal(tokens[3], tokens[4]);
             }
@@ -106,6 +109,8 @@ public class NMEA {
         public float altitude = 0.0f;
         public float velocity = 0.0f;
         public float day = 0.0f;
+        public String isGPS;
+
         public void updatefix() {
             fixed = quality > 0;
         }
