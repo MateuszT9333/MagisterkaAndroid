@@ -97,7 +97,7 @@ public class BiezacyOdczytActivity extends Activity {
     Thread thread = new Thread() {
         @Override
         public void run() {
-            while (true) {
+            while (!this.isInterrupted()) {
                 try {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -106,8 +106,10 @@ public class BiezacyOdczytActivity extends Activity {
                         }
                     });
                     Thread.sleep(500);
+                    Log.i("Biezacy odczyt watek", "pola zaktualizowane");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    Thread.currentThread().isInterrupted();
                 }
             }
         }
@@ -115,7 +117,7 @@ public class BiezacyOdczytActivity extends Activity {
     Thread threadSQL = new Thread() {
         @Override
         public void run() {
-            while (true) {
+            while (!this.isInterrupted()) {
                 try {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -124,8 +126,10 @@ public class BiezacyOdczytActivity extends Activity {
                         }
                     });
                     Thread.sleep(500);
+                    Log.i("Biezacy odczyt watek", "zapytanie o dane");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    Thread.currentThread().isInterrupted();
                 }
             }
         }

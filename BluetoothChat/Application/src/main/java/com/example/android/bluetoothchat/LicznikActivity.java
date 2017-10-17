@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.example.android.common.logger.Log;
 import com.example.android.utils.DBHelper;
+import com.example.android.utils.LicznikSavedInstance;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,57 +17,67 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class LicznikActivity extends Activity {
-    private static final String DYSTANS = "przejechanyDystansWKilometrach";
-    private static final String TRIP_IS_ENABLED = "tripIsEnabled";
-    private static final String ID_STARTU = "idStartu";
-    private static final String CZAS_JAZDY_W_MILISEKUNDACH = "czasJazdyWSekundach";
-    private static final String PREDKOSC_MAX = "predkoscMax";
-    private static final String TRIP_IS_STOPPED = "tripIsStopped";
     private static final String msg = "Wiadomosc";
     private TextView textView;
-    private static int oldId;
+    private int oldId = 0;
     DBHelper dbHelper = new DBHelper(this);
-    private Float przejechanyDystansWKilometrach; //przejechanyDystansWKilometrach od momentu nacisniecia start
-    private boolean tripIsEnabled; // jesli start zostal nacisniety
-    private int idStartu;
-    private long czasJazdyWSekundach;
-    private Float predkoscMax;
+    private Float przejechanyDystansWKilometrach = (float)0; //przejechanyDystansWKilometrach od momentu nacisniecia start
+    private boolean tripIsEnabled = false; // jesli start zostal nacisniety
+    private int idStartu = 0;
+    private long czasJazdyWSekundach = 0;
+    private Float predkoscMax = (float)0;
     private boolean tripIsStopped = false;
-    private boolean tripIsReset;
+    private boolean tripIsReset = false;
     private boolean databaseUpdate = true;
-    private Float predkoscChwilowa;
+    private Float predkoscChwilowa = (float)0;
+    private static LicznikSavedInstance licznikSavedInstance;
+    private boolean nowaPredkoscChwilowa = false;
+    private int newId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(savedInstanceState != null){
-            przejechanyDystansWKilometrach = savedInstanceState.getFloat(LicznikActivity.DYSTANS);
-            tripIsEnabled = savedInstanceState.getBoolean(LicznikActivity.TRIP_IS_ENABLED);
-            idStartu = savedInstanceState.getInt(LicznikActivity.ID_STARTU);
-            czasJazdyWSekundach = savedInstanceState.getLong(LicznikActivity.CZAS_JAZDY_W_MILISEKUNDACH);
-            predkoscMax = savedInstanceState.getFloat(LicznikActivity.PREDKOSC_MAX);
-            tripIsStopped = savedInstanceState.getBoolean(LicznikActivity.TRIP_IS_STOPPED);
-        }else {
-            przejechanyDystansWKilometrach= (float) 0;
-            czasJazdyWSekundach = 0;
-            predkoscMax = (float) 0;
-        }
-
-        oldId = getLatestId();
         setContentView(R.layout.activity_licznik);
-        aktualizujPola(dbHelper); // aktualizacja pola
+        pobierzStan();
+        oldId = getLatestId();
+
+        Cursor rs = dbHelper.getLatestData(); //odczytaj ostatni rekord z bazy danych
+        rs.moveToFirst();
+        predkoscChwilowa = aktualizujPredkosc(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_PREDKOSC)));
+        aktualizujPola(); // aktualizacja pola
         startAllThreads();
     }
     void startAllThreads(){
         thread.start();
+        thread.setPriority(3);
         threadSQL.start();
+        threadSQL.setPriority(2);
         threadSQL1.start();
+        threadSQL1.setPriority(1);
 
+    }
+    private void zapiszStan(){
+        licznikSavedInstance = licznikSavedInstance.getInstance();
+        licznikSavedInstance.przejechanyDystansWKilometrach = przejechanyDystansWKilometrach;
+        licznikSavedInstance.tripIsEnabled = tripIsEnabled;
+        licznikSavedInstance.idStartu = idStartu;
+        licznikSavedInstance.czasJazdyWSekundach = czasJazdyWSekundach;
+        licznikSavedInstance.predkoscMax = predkoscMax;
+        licznikSavedInstance.tripIsStopped = tripIsStopped;
+    }
+    private void pobierzStan(){
+        licznikSavedInstance = licznikSavedInstance.getInstance();
+        przejechanyDystansWKilometrach = licznikSavedInstance.przejechanyDystansWKilometrach;
+        tripIsEnabled = licznikSavedInstance.tripIsEnabled;
+        idStartu = licznikSavedInstance.idStartu;
+        czasJazdyWSekundach = licznikSavedInstance.czasJazdyWSekundach;
+        predkoscMax = licznikSavedInstance.predkoscMax;
+        tripIsStopped = licznikSavedInstance.tripIsStopped;
+        oldId = getLatestId();
     }
     @Override
     protected void onStart() {
         super.onStart();
-
         Log.d(msg, "The onStart() event");
     }
 
@@ -76,13 +87,17 @@ public class LicznikActivity extends Activity {
         super.onResume();
         if(!thread.isAlive()){
             thread.start();
+            thread.setPriority(2);
         }
         if(!threadSQL.isAlive()){
             threadSQL.start();
+            threadSQL.setPriority(3);
         }
         if(!threadSQL1.isAlive()){
             threadSQL1.start();
+            threadSQL1.setPriority(1);
         }
+        pobierzStan();
         Log.d(msg, "The onResume() event");
     }
 
@@ -90,6 +105,7 @@ public class LicznikActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        zapiszStan();
         Log.d(msg, "The onPause() event");
     }
 
@@ -97,6 +113,7 @@ public class LicznikActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
+        zapiszStan();
         Log.d(msg, "The onStop() event");
     }
 
@@ -104,22 +121,9 @@ public class LicznikActivity extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        zapiszStan();
         Log.d(msg, "The onDestroy() event");
     }
-
-//    @Override
-//    public void onRestoreInstanceState(Bundle savedInstanceState){
-//        if(savedInstanceState != null){
-//            przejechanyDystansWKilometrach = savedInstanceState.getFloat(LicznikActivity.DYSTANS);
-//            tripIsEnabled = savedInstanceState.getBoolean(LicznikActivity.TRIP_IS_ENABLED);
-//            idStartu = savedInstanceState.getInt(LicznikActivity.ID_STARTU);
-//            czasJazdyWSekundach = savedInstanceState.getLong(LicznikActivity.CZAS_JAZDY_W_MILISEKUNDACH);
-//            predkoscMax = savedInstanceState.getFloat(LicznikActivity.PREDKOSC_MAX);
-//            tripIsStopped = savedInstanceState.getBoolean(LicznikActivity.TRIP_IS_STOPPED);
-//        }
-//        super.onRestoreInstanceState(savedInstanceState);
-//
-//    }
 
     Thread thread = new Thread() {
         @Override
@@ -130,7 +134,9 @@ public class LicznikActivity extends Activity {
                         @Override
                         public void run() {
                             if(databaseUpdate) {
-                                aktualizujPola(dbHelper);
+                                Log.i("Wiadomosc", "aktualizujPola");
+                                aktualizujPola();
+                                nowaPredkoscChwilowa = false;
                             }
                         }
                     });
@@ -149,11 +155,11 @@ public class LicznikActivity extends Activity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(databaseUpdate) {
-                                databaseUpdate = isDatabaseUpdate();                            }
+                                databaseUpdate = isDatabaseUpdate();
+
                         }
                     });
-                    Thread.sleep(300);
+                    Thread.sleep(400);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -171,7 +177,10 @@ public class LicznikActivity extends Activity {
                             if(databaseUpdate) {
                                 Cursor rs = dbHelper.getLatestData(); //odczytaj ostatni rekord z bazy danych
                                 rs.moveToFirst();
-                                predkoscChwilowa = aktualizujPredkosc(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_PREDKOSC)));                            }
+                                predkoscChwilowa = aktualizujPredkosc(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_PREDKOSC)));
+                                nowaPredkoscChwilowa = true;
+                                Log.i("Wiadomosc", "nowaPredkoscChwilowa");
+                            }
                         }
                     });
                     Thread.sleep(300);
@@ -183,10 +192,15 @@ public class LicznikActivity extends Activity {
     };
 
     private boolean isDatabaseUpdate() {
-        int newId = getLatestId();
+        newId = getLatestId();
+        Log.i("Wiadomosc", "czyBazaUpdatowana?");
+        Log.e("NEW ID", String.valueOf(newId));
+        Log.e("OLD ID", String.valueOf(oldId));
         if(newId == oldId){
+            Log.e("Bazaupdatowana?", "NIE");
             return false;
         }else{
+            Log.e("Bazaupdatowana?", "TAK");
             oldId = newId;
             return true;
         }
@@ -231,14 +245,14 @@ public class LicznikActivity extends Activity {
     public void dalejButtonLicznik(View v) {
     }
 
-    private void aktualizujPola(DBHelper dbHelper)  {
+    private void aktualizujPola()  {
         if(tripIsStopped){
             return; //zamrazanie widoku
         }
         if(tripIsEnabled) {
-            aktualizujDystans(predkoscChwilowa);
-            aktualizujPredkoscSrednia(przejechanyDystansWKilometrach, czasJazdyWSekundach);
-            aktualizujPredkoscMax(predkoscChwilowa);
+            aktualizujDystans();
+            aktualizujPredkoscSrednia();
+            aktualizujPredkoscMax();
             aktualizujCzasJazdy();
         }else{
             aktualizujPustyDystans();
@@ -303,7 +317,7 @@ public class LicznikActivity extends Activity {
 
     }
 
-    private void aktualizujPredkoscMax(Float predkoscChwilowa) {
+    private void aktualizujPredkoscMax() {
         if(predkoscChwilowa > predkoscMax){
             predkoscMax = predkoscChwilowa;
         }
@@ -311,14 +325,14 @@ public class LicznikActivity extends Activity {
         textView.setText("MAX: " + String.format("%.2f", predkoscMax) + " km/h");
     }
 
-    private void aktualizujPredkoscSrednia(Float przejechanyDystansWKilometrach, long czasJazdyWSekundach) {
+    private void aktualizujPredkoscSrednia() {
         Float predkoscSrednia = (przejechanyDystansWKilometrach * 1000) / czasJazdyWSekundach; //metry na sekunde
         predkoscSrednia = predkoscSrednia /(float) 3.6;
         textView = (TextView) findViewById(R.id.text_licznik_predkosc_srednia);
         textView.setText("AVG: " + String.format("%.2f", predkoscSrednia) +  " km/h");
     }
 
-    private void aktualizujDystans(Float predkoscChwilowa) {
+    private void aktualizujDystans() {
         Float dystansWMetrach = predkoscChwilowa/(float)3.6; // przejechanyDystansWKilometrach przejechany w ciagu sekundy
         Float dystansWKilometrach = dystansWMetrach /(float) 1000; // przejechanyDystansWKilometrach w ciagu sekundy w kilometrach
         przejechanyDystansWKilometrach += dystansWKilometrach;
@@ -346,15 +360,4 @@ public class LicznikActivity extends Activity {
         }
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putFloat(LicznikActivity.DYSTANS, przejechanyDystansWKilometrach);
-        savedInstanceState.putBoolean(LicznikActivity.TRIP_IS_ENABLED, tripIsEnabled);
-        savedInstanceState.putInt(LicznikActivity.ID_STARTU, idStartu);
-        savedInstanceState.putLong(LicznikActivity.CZAS_JAZDY_W_MILISEKUNDACH, czasJazdyWSekundach);
-        savedInstanceState.putFloat(LicznikActivity.PREDKOSC_MAX, predkoscMax);
-        savedInstanceState.putBoolean(LicznikActivity.TRIP_IS_STOPPED,tripIsStopped);
-        super.onSaveInstanceState(savedInstanceState);
-
-    }
 }
