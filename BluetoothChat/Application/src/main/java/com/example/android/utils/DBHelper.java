@@ -116,10 +116,10 @@ public class DBHelper extends SQLiteOpenHelper {
         res.moveToFirst();
 
         while(res.isAfterLast() == false){
+            rowBuffer.add("DATA:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_DATA)));
             rowBuffer.add("SZ:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_SZEROKOSCGEOGRAFICZNA)));
             rowBuffer.add("DL:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_DLUGOSCGEOGRAFICZNA)));
             rowBuffer.add("GPS?:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_IS_GPS)));
-            rowBuffer.add("DATA:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_DATA)));
             rowBuffer.add("KIER:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_KIERUNEK)));
             rowBuffer.add("PRED:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_PREDKOSC)));
             rowBuffer.add("CIS:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_CISNIENIE)));
@@ -137,7 +137,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
             res.moveToNext();
         }
-        Log.i("array list", String .valueOf(array_list));
         return array_list;
     }
     public Cursor getLatestData(){
@@ -154,6 +153,11 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor res =  db.rawQuery( "SELECT id \n" +
                 "    FROM    Data\n" +
                 "    WHERE   id = (SELECT MAX(id)  FROM Data)", null );
+        return res;
+    }
+    public Cursor deleteData(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery("delete from " + BLUETOOTH_TABLE_NAME, null );
         return res;
     }
 }

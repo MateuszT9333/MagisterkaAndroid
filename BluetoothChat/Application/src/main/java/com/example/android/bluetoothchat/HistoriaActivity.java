@@ -68,6 +68,9 @@ public class HistoriaActivity extends Activity {
         adapter = new ArrayAdapter<>(this, R.layout.row, daneDoGrida);
         listView.setAdapter(adapter);
     }
+    public void deleteData(View v){
+        dbHelper.deleteData();
+    }
 
 }
 
