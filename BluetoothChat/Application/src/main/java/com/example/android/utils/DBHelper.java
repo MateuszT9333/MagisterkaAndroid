@@ -106,13 +106,39 @@ public class DBHelper extends SQLiteOpenHelper {
 
         return res;
     }
-    public Cursor getDataAsArray(int id) {
+    public ArrayList<String> getDataAsArray() {
         ArrayList<String> array_list = new ArrayList<>();
+        ArrayList<String> rowBuffer = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from Data where id="+id+"", null );
+        Cursor res =  db.rawQuery( "select * from " + BLUETOOTH_TABLE_NAME +
+                                   " order by id desc" +
+                                   " limit 3600", null );
         res.moveToFirst();
 
-        return res;
+        while(res.isAfterLast() == false){
+            rowBuffer.add("SZ:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_SZEROKOSCGEOGRAFICZNA)));
+            rowBuffer.add("DL:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_DLUGOSCGEOGRAFICZNA)));
+            rowBuffer.add("GPS?:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_IS_GPS)));
+            rowBuffer.add("DATA:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_DATA)));
+            rowBuffer.add("KIER:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_KIERUNEK)));
+            rowBuffer.add("PRED:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_PREDKOSC)));
+            rowBuffer.add("CIS:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_CISNIENIE)));
+            rowBuffer.add("TEMP:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_TEMPERATURA)));
+            rowBuffer.add("AX:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_AX)));
+            rowBuffer.add("AY:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_AY)));
+            rowBuffer.add("AZ:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_AZ)));
+            rowBuffer.add("GX:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_GX)));
+            rowBuffer.add("GY:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_GY)));
+            rowBuffer.add("GZ:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_GZ)));
+            rowBuffer.add("NAP:"+res.getString(res.getColumnIndex(BLUETOOTH_COLUMN_NAPIECIE)));
+
+            array_list.add(String.valueOf(rowBuffer));
+            rowBuffer.clear();
+
+            res.moveToNext();
+        }
+        Log.i("array list", String .valueOf(array_list));
+        return array_list;
     }
     public Cursor getLatestData(){
         SQLiteDatabase db = this.getReadableDatabase();
