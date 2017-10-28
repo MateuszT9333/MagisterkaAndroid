@@ -216,6 +216,7 @@ public class BluetoothDataParser {
         this.dlugoscGeograficzna = gpsPosition.lon;
         this.dateFromGPS = gpsPosition.dateFromGps;
         this.predkosc = gpsPosition.velocity * (float)1.852;
+        if(this.predkosc < (float)1.5) this.predkosc = (float)0;
         this.kierunek = gpsPosition.dir;
         this.isGPS = gpsPosition.isGPS;
 
