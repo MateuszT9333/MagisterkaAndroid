@@ -155,9 +155,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 "    WHERE   id = (SELECT MAX(id)  FROM Data)", null );
         return res;
     }
-    public Cursor deleteData(){
+    public void deleteData(){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery("delete from " + BLUETOOTH_TABLE_NAME, null );
-        return res;
+        db.execSQL("delete from "+ BLUETOOTH_TABLE_NAME + " where id!= " +
+        "( select min(id) from " + BLUETOOTH_TABLE_NAME + " ) ");
     }
 }

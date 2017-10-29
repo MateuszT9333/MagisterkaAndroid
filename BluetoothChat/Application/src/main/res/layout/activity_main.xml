@@ -24,14 +24,14 @@
           android:id="@+id/sample_output"
           android:layout_width="match_parent"
           android:layout_height="0px"
+          android:visibility="invisible"
           android:layout_weight="0.73">
 
         <fragment
-              android:name="com.example.android.common.logger.LogFragment"
-              android:id="@+id/log_fragment"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent" />
-
+            android:id="@+id/log_fragment"
+            android:name="com.example.android.common.logger.LogFragment"
+            android:layout_width="match_parent"
+            android:layout_height="513dp" />
     </ViewAnimator>
 
     <View
@@ -41,7 +41,7 @@
 
     <FrameLayout
           android:id="@+id/sample_content_fragment"
-          android:layout_weight="0.43"
+          android:layout_weight="0.09"
           android:layout_width="match_parent"
           android:layout_height="0px" >
 

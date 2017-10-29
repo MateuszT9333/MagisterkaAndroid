@@ -47,13 +47,13 @@
             android:theme="@android:style/Theme.Holo.Dialog" />
         <activity
             android:name=".BiezacyOdczytActivity"
-            android:label="Bieżacy odczyt" />
+            android:label="Bieżący odczyt" />
         <activity
             android:name=".LicznikActivity"
             android:label="Licznik rowerowy" />
         <activity
             android:name=".HistoriaActivity"
-            android:label="@string/title_activity_historia"></activity>
+            android:label="Kasowanie danych"></activity>
     </application>
 
 </manifest>

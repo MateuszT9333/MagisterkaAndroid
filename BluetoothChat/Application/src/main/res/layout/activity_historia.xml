@@ -6,45 +6,25 @@
     android:layout_height="match_parent"
     tools:context="com.example.android.bluetoothchat.HistoriaActivity">
 
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="0dp"
-        android:layout_height="443dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        android:layout_marginStart="13dp"
-        android:layout_marginEnd="13dp"
-        android:layout_marginTop="76dp"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginLeft="13dp"
-        android:layout_marginRight="13dp" />
-
-    <Button
-        android:id="@+id/button_historia"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:onClick="pobierzHistorieClick"
-        android:text="Pobierz"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_constraintRight_creator="1"
-        android:layout_marginEnd="27dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginRight="148dp" />
-
     <Button
         android:id="@+id/zaglada"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="deleteData"
-        android:visibility="invisible"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="148dp"
         android:layout_marginTop="16dp"
-        android:text="Zagłada"
+        android:onClick="deleteData"
+        android:text="Kasuj dane"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/historia_powrot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="clickPowrot"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="16dp"
+        android:text="Powrót"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
 </android.support.constraint.ConstraintLayout>

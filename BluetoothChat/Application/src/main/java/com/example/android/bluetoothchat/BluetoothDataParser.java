@@ -236,6 +236,7 @@ public class BluetoothDataParser {
 //        Log.i("gz", String.valueOf(this.gz));
 //        Log.i("Napiecie", String.valueOf(this.napiecie));
 //        Log.i("isGPS", this.isGPS);
+       // Log.e("Ilość wierszy", String.valueOf(dbHelper.numberOfRows()));
         dbHelper.insertData(this);
 
     }

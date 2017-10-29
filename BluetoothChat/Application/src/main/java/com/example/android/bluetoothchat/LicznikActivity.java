@@ -2,6 +2,7 @@ package com.example.android.bluetoothchat;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.View;
@@ -214,9 +215,15 @@ public class LicznikActivity extends Activity {
     }
 
     private int getLatestId() {
-        Cursor rs = dbHelper.getLatestId(); //odczytaj ostatni rekord z bazy danych
-        rs.moveToFirst();
-        return Integer.parseInt(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_ID))); //pobierz ostatnie id
+        try {
+            Cursor rs = dbHelper.getLatestId(); //odczytaj ostatni rekord z bazy danych
+            rs.moveToFirst();
+            return Integer.parseInt(rs.getString(rs.getColumnIndex(DBHelper.BLUETOOTH_COLUMN_ID))); //pobierz ostatnie id
+        }
+        catch(CursorIndexOutOfBoundsException e){
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     public void stopButtonLicznik(View v) {
