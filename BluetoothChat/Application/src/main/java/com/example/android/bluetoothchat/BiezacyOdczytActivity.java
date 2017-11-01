@@ -3,6 +3,7 @@ package com.example.android.bluetoothchat;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Activity;
 import android.os.Handler;
@@ -274,6 +275,11 @@ public class BiezacyOdczytActivity extends Activity {
         skalibrowana = skalibrowana * (float) 2;
         textView = (TextView) findViewById(R.id.text_biezace_napiecie);
         textView.setText("Nap:\n" + String.format("%.2f", skalibrowana ) + " V");
+        if(skalibrowana<(float)4.7){
+            textView.setTextColor(Color.RED);
+        }else{
+            textView.setTextColor(Color.BLACK);
+        }
     }
 
 
