@@ -1,9 +1,7 @@
 package com.example.android.utils;
 
-import com.example.android.bluetoothchat.LicznikActivity;
-
 /**
- * Created by mateusz on 17.10.17.
+ * @author Mateusz Trzeciak
  */
 
 public class LicznikSavedInstance {
@@ -14,7 +12,6 @@ public class LicznikSavedInstance {
     public int idStartu = 0;
     public boolean tripIsStopped = false;
     public boolean tripIsEnabled = false;
-//    public boolean tripIsReset;
 
     public static LicznikSavedInstance getInstance (){
         if(instance == null){

@@ -1,17 +1,12 @@
 package com.example.android.bluetoothchat;
 
-import com.example.android.common.logger.Log;
 import com.example.android.utils.DBHelper;
 import com.example.android.utils.NMEA;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
- * Created by mateusz on 14.10.17.
+ * @author Mateusz Trzeciak
  */
 
 public class BluetoothDataParser {

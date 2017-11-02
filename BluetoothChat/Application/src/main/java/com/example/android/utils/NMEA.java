@@ -3,8 +3,6 @@ package com.example.android.utils;
  * https://gist.github.com/javisantana/1326141
  */
 
-import com.example.android.common.logger.Log;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

@@ -17,7 +17,9 @@
 package com.example.android.bluetoothchat;
 
 /**
+ * @author Google
  * Defines several constants used between {@link BluetoothChatService} and the UI.
+ * https://developer.android.com/samples/BluetoothChat/project.html
  */
 public interface Constants {
 

@@ -32,6 +32,8 @@ import com.example.android.common.logger.MessageOnlyLogFilter;
 import com.example.android.utils.DBHelper;
 
 /**
+ * @author Google
+ * https://developer.android.com/samples/BluetoothChat/project.html
  * A simple launcher activity containing a summary sample description, sample log and a custom
  * {@link android.support.v4.app.Fragment} which can display a view.
  * <p>

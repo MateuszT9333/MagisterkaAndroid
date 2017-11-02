@@ -6,15 +6,13 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.example.android.bluetoothchat.BluetoothDataParser;
-import com.example.android.bluetoothchat.Constants;
 
 import java.util.ArrayList;
 
 /**
- * Created by mateusz on 15.10.17.
+ * @author Mateusz Trzeciak
  */
 
 public class DBHelper extends SQLiteOpenHelper {

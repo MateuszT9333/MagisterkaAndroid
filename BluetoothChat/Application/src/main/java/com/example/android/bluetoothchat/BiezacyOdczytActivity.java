@@ -1,27 +1,21 @@
 package com.example.android.bluetoothchat;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.app.Activity;
 import android.os.Handler;
-import android.renderscript.Float2;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.android.common.logger.Log;
 import com.example.android.utils.DBHelper;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static android.R.attr.offset;
-
+/**
+ * @author Mateusz Trzeciak
+ */
 public class BiezacyOdczytActivity extends Activity {
     private TextView textView;
     Handler handler = new Handler();
