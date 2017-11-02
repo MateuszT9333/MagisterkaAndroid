@@ -1,10 +1,10 @@
 package com.example.android.bluetoothchat;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
-import android.app.Activity;
 import android.view.View;
 import android.widget.TextView;
 
@@ -12,11 +12,11 @@ import com.example.android.common.logger.Log;
 import com.example.android.utils.DBHelper;
 import com.example.android.utils.LicznikSavedInstance;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
+/**
+ * @author Mateusz Trzeciak
+ */
 public class LicznikActivity extends Activity {
     private static final String msg = "Wiadomosc";
     private TextView textView;
@@ -283,7 +283,6 @@ public class LicznikActivity extends Activity {
         czasJazdy.setTimeInMillis(czasJazdyWSekundach * 1000);
 
         int hours = czasJazdy.get(Calendar.HOUR);
-        if(hours == 1) hours=0; //TODO usun
         int minutes = czasJazdy.get(Calendar.MINUTE);
         int seconds = czasJazdy.get(Calendar.SECOND);
 
@@ -334,7 +333,6 @@ public class LicznikActivity extends Activity {
         czasJazdy.setTimeInMillis(czasJazdyWSekundach * 1000);
 
         int hours = czasJazdy.get(Calendar.HOUR);
-        if(hours == 1) hours=0; //TODO usun
         int minutes = czasJazdy.get(Calendar.MINUTE);
         int seconds = czasJazdy.get(Calendar.SECOND);
 
